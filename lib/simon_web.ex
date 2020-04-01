@@ -23,6 +23,7 @@ defmodule SimonWeb do
 
       import Plug.Conn
       import SimonWeb.Gettext
+      import Phoenix.LiveView.Controller
       alias SimonWeb.Router.Helpers, as: Routes
     end
   end
@@ -41,6 +42,7 @@ defmodule SimonWeb do
 
       import SimonWeb.ErrorHelpers
       import SimonWeb.Gettext
+      import Phoenix.LiveView.Helpers
       alias SimonWeb.Router.Helpers, as: Routes
     end
   end
@@ -50,6 +52,7 @@ defmodule SimonWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import Phoenix.LiveView.Router
     end
   end
 

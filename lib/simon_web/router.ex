@@ -4,23 +4,15 @@ defmodule SimonWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
-    plug :fetch_flash
+    plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-  end
-
-  pipeline :api do
-    plug :accepts, ["json"]
+    plug :put_root_layout, {SimonWeb.LayoutView, :root}
   end
 
   scope "/", SimonWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    live "/", HomeLive
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", SimonWeb do
-  #   pipe_through :api
-  # end
 end

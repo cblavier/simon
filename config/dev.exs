@@ -51,8 +51,9 @@ config :simon, SimonWeb.Endpoint,
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
+      ~r"lib/simon/.*(ex)$",
       ~r"lib/simon_web/(live|views)/.*(ex)$",
-      ~r"lib/simon_web/templates/.*(eex)$"
+      ~r"lib/simon_web/templates/.*(eex|slim|lslim)$"
     ]
   ]
 
