@@ -13,6 +13,6 @@ defmodule SimonWeb.Router do
   scope "/", SimonWeb do
     pipe_through :browser
 
-    live "/", HomeLive
+    live "/", GameLive
   end
 end

@@ -1,3 +1,75 @@
-p {
-  font-size: 20px;
+$simon_size: 40vh;
+$center_size: 45%;
+
+body, document {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  height: 100vh;
+}
+
+#container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#simon-game {
+  position: relative;
+  width: $simon_size;
+  height: $simon_size;
+  border-radius: 50%;
+  overflow: hidden;
+
+  #red-button, #green-button, #yellow-button, #blue-button {
+    position: absolute;
+    cursor: pointer;
+    width: 45%;
+    height: 45%;
+    &:hover, &.active {
+      filter: brightness(75%);
+    }
+  }
+
+  #green-button {
+    background: green;
+    top: 0; 
+    left: 0;
+  }
+
+  #red-button {
+    background: red;
+    top: 0; 
+    right: 0;
+  }
+
+  #yellow-button {
+    background: yellow;
+    bottom: 0; 
+    left: 0;
+  }
+
+  #blue-button {
+    background: blue;
+    right: 0;
+    bottom: 0;
+  }
+
+  #center {
+    position: absolute;
+    background: white;
+    top: (100% - $center_size) / 2;
+    left: (100% - $center_size) / 2;
+    height: $center_size;
+    width: $center_size;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score {
+    font-size: 6vw;
+    font-weight: bold;
+  }
 }

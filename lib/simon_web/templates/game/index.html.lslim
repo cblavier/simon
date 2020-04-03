@@ -1,0 +1,8 @@
+#simon-game
+  #green-button class=active_class(@active_button, :green)
+  #red-button class=active_class(@active_button, :red)
+  #yellow-button class=active_class(@active_button, :yellow)
+  #blue-button class=active_class(@active_button, :blue)
+  #center
+    .score= @current_turn
+  

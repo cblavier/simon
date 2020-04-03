@@ -5,9 +5,10 @@ html lang="en"
     meta http-equiv="X-UA-Compatible" content="IE=edge"
     meta name="viewport" content="width=device-width, initial-scale=1.0"
     title Simon
+    link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"
     link rel="stylesheet" href=Routes.static_path(@conn, "/css/app.css")
     = csrf_meta_tag()
   body
-    main role="main" class="container"
+    main#container role="main"
       = @inner_content
     script type="text/javascript" src=Routes.static_path(@conn, "/js/app.js")
