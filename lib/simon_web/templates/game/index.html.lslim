@@ -16,9 +16,11 @@
         
   
 .player-container
-  = for {pid, player_name} <- @players do
+  = for {pid, player_name, _perk} <- @players do
     .player class=active_player_class(pid, @current_player)
       .player-name= player_name
+      = if _perk do
+        .player-perk= _perk
 
 .message
   p= @message

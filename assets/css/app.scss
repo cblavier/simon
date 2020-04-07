@@ -128,6 +128,12 @@ body, document {
       font-size: 3vh;
       transition: font-size 0.2s ease-in;
     }
+    .player-perk {
+      color: green;
+      font-style: italic;
+      font-size: 1.5vh;
+      padding-top: 0.5vh;
+    }
     &.active {
       .player-name {
         color: green;

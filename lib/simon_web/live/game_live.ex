@@ -4,7 +4,7 @@ defmodule SimonWeb.GameLive do
   alias Simon.GameServer
   alias SimonWeb.GameView
 
-  @sequence_size 5
+  @sequence_size 10
   @round_delay 1000
   @sequence_delay 200
   @guess_delay 700
@@ -89,8 +89,13 @@ defmodule SimonWeb.GameLive do
   end
 
   defp new_player(module, name, game_server) do
-    supported_perks = apply(module, :supported_perks)
-    perk = Enum.random(supported_perks)
+    perk =
+      if Keyword.has_key?(module.__info__(:functions), :supported_perks) do
+        supported_perks = apply(module, :supported_perks, [])
+        Enum.random(supported_perks ++ [nil])
+      else
+        nil
+      end
 
     {:ok, player} =
       apply(module, :start_link, [
