@@ -1,6 +1,6 @@
 # Simon
 
-Le but de code challenge est d'implémenter une IA joueur pour le Simon's Game.
+Ce projet est un code challenge dont le but est d'apprendre le fonctionnement des `GenServer` Elixir en implémentant une IA joueur pour le Simon's Game.
 
 [![Alt text](https://img.youtube.com/vi/G6p7zRsECaI/0.jpg)](https://www.youtube.com/watch?v=G6p7zRsECaI)
 
@@ -71,4 +71,16 @@ Evidemment via la LiveView mais également avec `ExUnit`. Vous pouvez vous inspi
 
 ## Supporter des perks
 
-TODO
+Afin d'apporter un peu de sel aux parties, vos IA vont être dotées de facultées qui malheureusement feront toutes prendre fin à la partie de manièré prématurée.
+
+Votre IA doit supporter la fonction suivante : 
+
+  - `supported_perks/0` qui retourne un tableau d'atoms de cette forme : `[:color_blind, :amnesic]`
+  - au lancement de la partie, votre player sera aléatoirement doté d'un _perk_ parmi la liste supportée par votre IA via l'option `perk` passée à `start_link/1`
+
+Implémentez les perks que vous souhaitez, voici quelques exemples :
+
+  - `:color_blind` : ne fait pas la différence entre bleu et rouge 
+  - `:short_memory` : ne se souvient que des 5 derniers tours, pour le reste, c'est du hasard 🎲
+  - `:rebel` : n'écoute pas les séquences du `GameServer`, uniquement les coups joués par les autres joueurs
+  - `:asshole` : envoie des fausses séquences aux autres joueurs

@@ -3,7 +3,6 @@ import css from "../css/app.scss"
 import { Socket } from "phoenix"
 import LiveSocket from "phoenix_live_view"
 
-
 let audioGreen = new Audio("https://s3.amazonaws.com/freecodecamp/simonSound1.mp3")
 let audioRed = new Audio("https://s3.amazonaws.com/freecodecamp/simonSound2.mp3")
 let audioYellow = new Audio("https://s3.amazonaws.com/freecodecamp/simonSound3.mp3")
