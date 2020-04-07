@@ -7,7 +7,11 @@ Ce projet est un code challenge dont le but est d'apprendre le fonctionnement de
 ## Démarrage du serveur
 
 Première étape, s'assurer que le projet actuel fonctionne sur votre poste.
-Il n'y a pas de base de données : `mix deps.get` puis `mix phx.server` suffisent.
+
+Il n'y a pas de base de données, il suffit donc de lancer :
+- `mix deps.get`
+- `mix phx.server`
+- `cd assets && npm install`
 
 En appuyant sur "START" la partie doit démarrer puis s'arrêter aussitôt.
 
