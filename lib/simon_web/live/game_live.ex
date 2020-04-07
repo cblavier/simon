@@ -16,11 +16,7 @@ defmodule SimonWeb.GameLive do
   #   [module: RemyPlayer, name: "Rémy"]
   # ]
 
-  @player_configs [
-    [module: Simon.GoodPlayer, name: "Brice"],
-    [module: Simon.GoodPlayer, name: "Matthieu"],
-    [module: Simon.GoodPlayer, name: "Rémy"]
-  ]
+  @player_configs []
 
   def render(assigns) do
     GameView.render("index.html", assigns)
