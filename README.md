@@ -16,8 +16,9 @@ L'application est constituée de deux composants principaux :
 - `GameLive` est une `LiveView` qui permet de démarrer la partie puis de suivre son avancement.
 - `GameServer` est un `GenServer` qui gère l'état de la partie, donne le tour de jeu au joueur et s'assure que les séquences de couleurs entrées sont correctes. `GameServer` notifie l'ensemble de ses listeners (les joueurs et la liveview) des évènements de la partie.
 
+## Coder votre IA
 
-## Coder un bon joueur
+**Vous allez coder votre IA sous la forme d'une branche + pull request sur ce repo.**
 
 L'IA de votre joueur doit être capable de jouer correctement une partie sur toute la longueur de la séquence.
 Votre serveur sera codée sous la forme d'un GenServer qui implémente les fonctions suivantes :
@@ -63,9 +64,7 @@ Votre serveur sera codée sous la forme d'un GenServer qui implémente les fonct
   * `{:lose}`
     * La partie vient de se terminer sur une erreur 😞
 
-
-
-## Tester votre joueur
+## Tester votre IA
 
 Evidemment via la LiveView mais également avec `ExUnit`. Vous pouvez vous inspirer du test de `game_server_test.exs`.    
 
