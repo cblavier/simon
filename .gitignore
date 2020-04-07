@@ -34,3 +34,7 @@ npm-debug.log
 /priv/static/
 
 .elixir_ls
+lib/simon/good_player.ex
+
+lib/simon/random_player.ex
+

@@ -3,41 +3,49 @@ defmodule Simon.GameServerTest do
 
   alias Simon.GameServer
 
-  test "good game sequence" do
-    {:ok, game_server} = GameServer.start_link(sequence: [:red, :green])
+  setup do
+    {:ok, game_server} =
+      GameServer.start_link(
+        sequence_delay: 0,
+        round_delay: 0,
+        sequence: [:red, :green]
+      )
 
-    GameServer.join(game_server, self())
-    GameServer.start(game_server)
+    GenServer.cast(game_server, {:join, self(), "Bob"})
+    GenServer.cast(game_server, :start)
+    {:ok, %{game_server: game_server}}
+  end
 
+  test "good game sequence", %{game_server: game_server} do
     receive do
-      {:sequence_color, turn, color} ->
-        assert turn == 1
+      {:sequence_color, round, color} ->
+        assert round == 1
         assert color == :red
     end
 
     receive do
-      {:your_turn, turn} ->
-        assert turn == 1
-        assert :ok == GameServer.color_guess(game_server, :red)
+      {:your_round, round} ->
+        assert round == 1
+        assert :ok == color_guess(game_server, :red)
     end
 
     receive do
-      {:sequence_color, turn, color} ->
-        assert turn == 2
+      {:sequence_color, round, color} ->
+        assert round == 2
         assert color == :red
     end
 
     receive do
-      {:sequence_color, turn, color} ->
-        assert turn == 2
+      {:sequence_color, round, color} ->
+        assert round == 2
         assert color == :green
     end
 
     receive do
-      {:your_turn, turn} ->
-        assert turn == 2
-        assert :ok == GameServer.color_guess(game_server, :red)
-        assert :ok == GameServer.color_guess(game_server, :green)
+      {:your_round, round} ->
+        assert round == 2
+        assert :ok == color_guess(game_server, :red)
+        assert :ok == color_guess(game_server, :green)
     end
 
     receive do
@@ -45,45 +53,42 @@ defmodule Simon.GameServerTest do
     end
   end
 
-  test "bad guess" do
-    {:ok, game_server} = GameServer.start_link(sequence: [:red, :green])
-
-    GameServer.join(game_server, self())
-    GameServer.start(game_server)
-
+  test "bad guess", %{game_server: game_server} do
     receive do
-      {:sequence_color, turn, color} ->
-        assert turn == 1
+      {:sequence_color, round, color} ->
+        assert round == 1
         assert color == :red
     end
 
     receive do
-      {:your_turn, turn} ->
-        assert turn == 1
-        assert :ok == GameServer.color_guess(game_server, :red)
+      {:your_round, round} ->
+        assert round == 1
+        assert :ok == color_guess(game_server, :red)
     end
 
     receive do
-      {:sequence_color, turn, color} ->
-        assert turn == 2
+      {:sequence_color, round, color} ->
+        assert round == 2
         assert color == :red
     end
 
     receive do
-      {:sequence_color, turn, color} ->
-        assert turn == 2
+      {:sequence_color, round, color} ->
+        assert round == 2
         assert color == :green
     end
 
     receive do
-      {:your_turn, turn} ->
-        assert turn == 2
-        assert :ok == GameServer.color_guess(game_server, :red)
-        assert :bad_guess == GameServer.color_guess(game_server, :blue)
+      {:your_round, round} ->
+        assert round == 2
+        assert :ok == color_guess(game_server, :red)
+        assert :bad_guess == color_guess(game_server, :blue)
     end
 
     receive do
       :lose -> assert true
     end
   end
+
+  defp color_guess(pid, color), do: GenServer.call(pid, {:color_guess, color})
 end

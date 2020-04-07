@@ -1,8 +1,24 @@
 #simon-game
-  #green-button class=active_class(@active_button, :green)
-  #red-button class=active_class(@active_button, :red)
-  #yellow-button class=active_class(@active_button, :yellow)
-  #blue-button class=active_class(@active_button, :blue)
+  #green-button class=active_class(@active_button, :green) phx-hook="GreenUpdated"
+  #red-button class=active_class(@active_button, :red) phx-hook="RedUpdated"
+  #yellow-button class=active_class(@active_button, :yellow) phx-hook="YellowUpdated"
+  #blue-button class=active_class(@active_button, :blue) phx-hook="BlueUpdated"
   #center
-    .score= @current_turn
+    = if @status == :running do
+      .score= @round
+    - else
+      = if @status == :not_started do
+        a.start-game phx-click="start" 
+          .label Start
+      - else
+        a.start-game onclick="window.location.reload();"
+            .label Restart
+        
   
+.player-container
+  = for {pid, player_name} <- @players do
+    .player class=active_player_class(pid, @current_player)
+      .player-name= player_name
+
+.message
+  p= @message

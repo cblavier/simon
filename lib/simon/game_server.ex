@@ -1,8 +1,10 @@
 defmodule Simon.GameServer do
   use GenServer
 
-  @sequence_size 100_000
-  @sequence_delay 500
+  @default_sequence_size 10
+  @default_sequence_delay 500
+  @default_round_delay 1000
+
   @colors ~w(green red yellow blue)a
 
   def start_link(opts \\ []) do
@@ -10,44 +12,43 @@ defmodule Simon.GameServer do
   end
 
   def init(opts) do
-    sequence = Keyword.get(opts, :sequence, build_sequence())
+    sequence_size = Keyword.get(opts, :sequence_size, @default_sequence_size)
+    sequence = Keyword.get(opts, :sequence, build_sequence(sequence_size))
+    round_delay = Keyword.get(opts, :round_delay, @default_round_delay)
+
+    sequence_delay = Keyword.get(opts, :sequence_delay, @default_sequence_delay)
 
     {:ok,
      %{
-       turn: 0,
+       round: 0,
        watchers: [],
        players: [],
        sequence: sequence,
        current_guess_sequence: [],
        current_player: nil,
-       status: :waiting_for_start
+       status: :waiting_for_start,
+       sequence_delay: sequence_delay,
+       round_delay: round_delay
      }}
   end
-
-  def watch(pid, watcher), do: GenServer.cast(pid, {:watch, watcher})
-  def join(pid, player), do: GenServer.cast(pid, {:join, player})
-  def start(pid), do: GenServer.cast(pid, :start)
-  def color_guess(pid, color), do: GenServer.call(pid, {:color_guess, color})
 
   def handle_cast({:watch, watcher}, state = %{watchers: watchers}) do
     {:noreply, %{state | watchers: [watcher | watchers]}}
   end
 
-  def handle_cast({:join, player}, state = %{players: players}) do
-    {:noreply, %{state | players: [player | players]}}
+  def handle_cast({:join, player_pid, player_name}, state = %{players: players}) do
+    {:noreply, %{state | players: [{player_pid, player_name} | players]}}
   end
 
-  def handle_cast(:start, state = %{sequence: sequence, status: :waiting_for_start, turn: 0}) do
-    turn = 1
-    player = game_server_turn(state.players, state.watchers, sequence, turn)
-    notify_listeners(state.players ++ state.watchers, {:current_player, player})
+  def handle_cast(:start, state = %{status: :waiting_for_start, round: 0}) do
+    {new_player, new_round} = game_server_round(state)
 
     {:noreply,
      %{
        state
-       | turn: turn,
+       | round: new_round,
          status: :waiting_for_player_input,
-         current_player: player,
+         current_player: new_player,
          current_guess_sequence: []
      }}
   end
@@ -55,32 +56,43 @@ defmodule Simon.GameServer do
   def handle_call(
         {:color_guess, _guess},
         {from_pid, _ref},
-        state = %{current_player: current_player}
+        state = %{current_player: {current_player_pid, _}}
       )
-      when current_player != from_pid do
+      when current_player_pid != from_pid do
     {:reply, :invalid_player, state}
   end
 
   def handle_call(
         {:color_guess, guess},
         _from,
-        state = %{turn: turn, sequence: sequence, current_guess_sequence: current_guess_sequence}
+        state = %{
+          round: round,
+          sequence: sequence,
+          current_guess_sequence: current_guess_sequence
+        }
       ) do
     current_guess_sequence = current_guess_sequence ++ [guess]
     correct_sequence = Enum.take(sequence, length(current_guess_sequence))
     state = %{state | current_guess_sequence: current_guess_sequence}
+    state |> listeners |> notify_listeners({:guess, guess, state.current_player})
 
     if correct_sequence == current_guess_sequence do
-      if length(correct_sequence) == turn do
-        turn = turn + 1
-        game_server_turn(state.players, state.watchers, sequence, turn)
-        state = %{state | turn: turn, current_guess_sequence: []}
+      if length(correct_sequence) == round do
+        {new_player, new_round} = game_server_round(state)
+
+        state = %{
+          state
+          | round: new_round,
+            current_player: new_player,
+            current_guess_sequence: []
+        }
+
         {:reply, :ok, state}
       else
         {:reply, :ok, state}
       end
     else
-      end_game(:lose, state.players ++ state.watchers)
+      end_game(:lose, listeners(state))
       {:reply, :bad_guess, state}
     end
   end
@@ -89,36 +101,47 @@ defmodule Simon.GameServer do
     {:stop, :normal, state}
   end
 
-  defp build_sequence do
+  def handle_info(_, state) do
+    {:noreply, state}
+  end
+
+  defp build_sequence(size) do
     Enum.map(
-      1..@sequence_size,
+      1..size,
       fn _ -> Enum.random(@colors) end
     )
   end
 
-  defp game_server_turn(players, watchers, sequence, turn) do
-    if turn < length(sequence) + 1 do
-      play_sequence(players ++ watchers, sequence, turn)
-      give_player_turn(players, turn)
+  defp game_server_round(state = %{players: players, sequence: sequence, round: round}) do
+    if round < length(sequence) do
+      :timer.sleep(state.round_delay)
+      new_round = round + 1
+      state |> listeners |> play_sequence(sequence, new_round, state.sequence_delay)
+      new_player = give_player_round(players, new_round)
+
+      :timer.sleep(state.round_delay)
+      state |> listeners |> notify_listeners({:current_player, new_player})
+      {new_player, new_round}
     else
-      end_game(:win, players ++ watchers)
+      end_game(:win, listeners(state))
+      {state.current_player, state.round}
     end
   end
 
-  defp play_sequence(listeners, sequence, turn) do
-    sequence = Enum.take(sequence, turn)
+  defp play_sequence(listeners, sequence, round, sequence_delay) do
+    sequence = Enum.take(sequence, round)
 
     Enum.each(sequence, fn color ->
       Enum.each(listeners, fn pid ->
-        Process.send(pid, {:sequence_color, turn, color}, [])
-        :timer.sleep(@sequence_delay)
+        Process.send(pid, {:sequence_color, round, color}, [])
+        :timer.sleep(sequence_delay)
       end)
     end)
   end
 
-  defp give_player_turn(players, turn) do
-    player = Enum.random(players)
-    Process.send(player, {:your_turn, turn}, [])
+  defp give_player_round(players, round) do
+    player = {player_pid, _player_name} = Enum.random(players)
+    Process.send(player_pid, {:your_round, round}, [])
     player
   end
 
@@ -131,5 +154,9 @@ defmodule Simon.GameServer do
   defp end_game(status, listeners) do
     notify_listeners(listeners, status)
     Process.send(self(), :halt, [])
+  end
+
+  defp listeners(%{players: players, watchers: watchers}) do
+    Enum.map(players, &elem(&1, 0)) ++ watchers
   end
 end

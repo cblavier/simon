@@ -1,19 +1,74 @@
 # Simon
 
-To start your Phoenix server:
+Le but de code challenge est d'implémenter une IA joueur pour le Simon's Game.
 
-  * Install dependencies with `mix deps.get`
-  * Install Node.js dependencies with `cd assets && npm install`
-  * Start Phoenix endpoint with `mix phx.server`
+[![Alt text](https://img.youtube.com/vi/G6p7zRsECaI/0.jpg)](https://www.youtube.com/watch?v=G6p7zRsECaI)
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+## Démarrage du serveur
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+Première étape, s'assurer que le projet actuel fonctionne sur votre poste.
+Il n'y a pas de base de données : `mix deps.get` puis `mix phx.server` suffisent.
 
-## Learn more
+En appuyant sur "START" la partie doit démarrer puis s'arrêter aussitôt.
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+L'application est constituée de deux composants principaux :
+
+- `GameLive` est une `LiveView` qui permet de démarrer la partie puis de suivre son avancement.
+- `GameServer` est un `GenServer` qui gère l'état de la partie, donne le tour de jeu au joueur et s'assure que les séquences de couleurs entrées sont correctes. `GameServer` notifie l'ensemble de ses listeners (les joueurs et la liveview) des évènements de la partie.
+
+
+## Coder un bon joueur
+
+L'IA de votre joueur doit être capable de jouer correctement une partie sur toute la longueur de la séquence.
+Votre serveur sera codée sous la forme d'un GenServer qui implémente les fonctions suivantes :
+
+* `start_link/1` 
+  * Le tableau d'options suivantes lui sera passé `[game_server: game_server, name: name, perk: perk, guess_delay: guess_delay, round_delay: round_delay]`
+    * `game_server` est le pid du process qui gère la partie
+    * `name` est une string qui représente le nom donnée à votre joueur
+    * `guess_delay` est une durée en ms qui représente le temps après chaque couleur lorsque votre IA donne sa séquence.
+    * `round_delay` est une durée en ms qui représente le temps à attendre au début de votre tour avant de donner la première couleur de la séquence.
+
+  - Lorsque votre serveur est démarré, il doit d'abord rejoindre la partie en faisant un appel de type `cast` au GenServer avec le message suivant : `{:join, player_pid, player_name}`
+
+* Gérer les messages `handle_info/2` suivants 
+  * `{:sequence_color, round, color}`
+    * Ce message est lancé plusieurs fois par le gen_server pour indiquer la séquence en cours (au tour #3, le GameServer va envoyer 3x ce message d'affilée pour chacune des couleurs; au début du tour 10 ce message sera lancé 10x)
+    * `round` est le numéro du tour en cours
+    * `color` est un atom parmi `:red`, `:yellow`, `:green`, `:blue` 
+
+  * `{:your_round, round}`
+    * Ce message n'est adressé qu'au joueur qui a été choisi par le `GameServer` pour jouer le tour en cours.
+    * `round` est le numéro du tour en cours
+    * Lorsque ce message est adressé à votre IA, elle doit:
+      1. Attendre `round_delay` ms
+      2. Attendre `guess_delay` ms
+      3. Envoyer au `GameServer` un message de type `call` avec les paramètres suivants `{:color_guess, color}`. **Attention, cet appel doit être effectué avec un timeout :infinity !!!**
+      4. Vérifier le résultat de l'appel : si `:ok` on reprend à l'étape 2 jusqu'à ce que la séquence soit terminée, Si `:bad_guess` on s'arrête là.
+
+  * `{:current_player, {player_pid, player_name}}`
+    * Ce message est adressé à tous les joueurs (en même temps que :your_round) pour indiquer à tous quel joueur a commencé son tour.
+    * `player_pid` est le process du joueur qui prend le tour
+    * `player_name` est le nom du joueur qui prend le tour
+
+  * `{:guess, color, {player_pid, player_name}}`
+    * Ce message est adressé à tous les joueurs (en même temps que :your_round) pour indiquer à tous quel coup vient d'être joué.
+    * `color` est la couleur qui vient d'être jouée
+    * `player_pid` est le process du joueur qui vient de jouer
+    * `player_name` est le nom du joueur qui vient de jouer
+
+  * `{:win}`
+    * La partie vient de se terminer en arrivant au bout la séquence sans erreur 🥳
+
+  * `{:lose}`
+    * La partie vient de se terminer sur une erreur 😞
+
+
+
+## Tester votre joueur
+
+Evidemment via la LiveView mais également avec `ExUnit`. Vous pouvez vous inspirer du test de `game_server_test.exs`.    
+
+## Supporter des perks
+
+TODO

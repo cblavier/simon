@@ -11,7 +11,7 @@ defmodule SimonWeb.UserSocket do
   #
   #     {:ok, assign(socket, :user_id, verified_user_id)}
   #
-  # To deny connection, return `:error`.
+  # To deny connection, reround `:error`.
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
@@ -28,6 +28,6 @@ defmodule SimonWeb.UserSocket do
   #
   #     SimonWeb.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})
   #
-  # Returning `nil` makes this socket anonymous.
+  # Rerounding `nil` makes this socket anonymous.
   def id(_socket), do: nil
 end

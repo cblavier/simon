@@ -5,13 +5,16 @@ body, document {
   font-family: 'Roboto', sans-serif;
   margin: 0;
   height: 100vh;
+  overflow: hidden;
 }
 
 #container {
   height: 100vh;
-  display: flex;
+  width: 100vw;
+  max-width: 800px;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
 }
 
 #simon-game {
@@ -20,6 +23,7 @@ body, document {
   height: $simon_size;
   border-radius: 50%;
   overflow: hidden;
+  margin: 5vh auto;
 
   #red-button, #green-button, #yellow-button, #blue-button {
     position: absolute;
@@ -71,5 +75,65 @@ body, document {
   .score {
     font-size: 6vw;
     font-weight: bold;
+  }
+
+  .start-game {
+    display: flex;
+    text-transform: uppercase;
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+    background: black;
+    align-items: center;
+    vertical-align: center;
+    cursor: pointer;
+    &:hover {
+      background: lighten(black, 30%);
+    }
+    .label {
+      flex: 1;
+      color: white;
+      text-align: center;
+    }
+  }
+}
+
+.message {
+  display: flex;
+  width: 100%;
+  text-align: center;
+  font-size: 4vh;
+  height: 20vh;
+  justify-content: center;
+  align-items: center;
+  p {
+    color: blue;
+    flex: 1;
+  }
+}
+
+.player-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 5vh;
+  margin: 5vh auto 5vh;
+  flex-grow: 1;
+
+  .player {
+    flex-grow: 1;
+    text-align: center;
+    .player-name {
+      vertical-align: middle;
+      font-size: 3vh;
+      transition: font-size 0.2s ease-in;
+    }
+    &.active {
+      .player-name {
+        color: green;
+        font-weight: bold;
+        font-size: 4vh;
+      }
+    }
   }
 }
