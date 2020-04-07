@@ -29,9 +29,9 @@ L'IA de votre joueur doit être capable de jouer correctement une partie sur tou
 Votre serveur sera codée sous la forme d'un GenServer qui implémente les fonctions suivantes :
 
 * `start_link/1` 
-  * Le tableau d'options suivantes lui sera passé `[game_server: game_server, name: name, perk: perk, guess_delay: guess_delay, round_delay: round_delay]`
+  * Le tableau d'options suivantes lui sera passé `[game_server: game_server, name: name, guess_delay: guess_delay, round_delay: round_delay]`
     * `game_server` est le pid du process qui gère la partie
-    * `name` est une string qui représente le nom donnée à votre joueur
+    * `name` est une string qui représente le nom donné à votre joueur
     * `guess_delay` est une durée en ms qui représente le temps après chaque couleur lorsque votre IA donne sa séquence.
     * `round_delay` est une durée en ms qui représente le temps à attendre au début de votre tour avant de donner la première couleur de la séquence.
 
@@ -80,7 +80,7 @@ Afin d'apporter un peu de sel aux parties, vos IA vont être dotées de faculté
 Votre IA doit supporter la fonction suivante : 
 
   - `supported_perks/0` qui retourne un tableau d'atoms de cette forme : `[:color_blind, :amnesic]`
-  - au lancement de la partie, votre player sera aléatoirement doté d'un _perk_ parmi la liste supportée par votre IA via l'option `perk` passée à `start_link/1`
+  - au lancement de la partie, votre player sera aléatoirement doté d'un _perk_ parmi la liste supportée par votre IA via une nouvelle option `perk` passée à `start_link/1`
 
 Implémentez les perks que vous souhaitez, voici quelques exemples :
 
