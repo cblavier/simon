@@ -30,13 +30,13 @@ Votre serveur sera codée sous la forme d'un GenServer qui implémente les fonct
     * `guess_delay` est une durée en ms qui représente le temps après chaque couleur lorsque votre IA donne sa séquence.
     * `round_delay` est une durée en ms qui représente le temps à attendre au début de votre tour avant de donner la première couleur de la séquence.
 
-  - Lorsque votre serveur est démarré, il doit d'abord rejoindre la partie en faisant un appel de type `cast` au GenServer avec le message suivant : `{:join, player_pid, player_name}`
+  - Lorsque votre serveur est démarré, il doit d'abord rejoindre la partie en faisant un appel de type `cast` au `GameServer` avec le message suivant : `{:join, player_pid, player_name}`
 
 * Gérer les messages `handle_info/2` suivants 
   * `{:sequence_color, round, color}`
-    * Ce message est lancé plusieurs fois par le gen_server pour indiquer la séquence en cours (au tour #3, le GameServer va envoyer 3x ce message d'affilée pour chacune des couleurs; au début du tour 10 ce message sera lancé 10x)
+    * Ce message est lancé plusieurs fois par le `GameServer` pour indiquer la séquence en cours (au tour 3, le `GameServer` va envoyer 3x ce message d'affilée pour chacune des couleurs; au début du tour 10 ce message sera lancé 10x)
     * `round` est le numéro du tour en cours
-    * `color` est un atom parmi `:red`, `:yellow`, `:green`, `:blue` 
+    * `color` est un atom parmi `:red`, `:yellow`, `:green` et `:blue` 
 
   * `{:your_round, round}`
     * Ce message n'est adressé qu'au joueur qui a été choisi par le `GameServer` pour jouer le tour en cours.
@@ -79,7 +79,7 @@ Votre IA doit supporter la fonction suivante :
 
 Implémentez les perks que vous souhaitez, voici quelques exemples :
 
-  - `:color_blind` : ne fait pas la différence entre bleu et rouge 
-  - `:short_memory` : ne se souvient que des 5 derniers tours, pour le reste, c'est du hasard 🎲
-  - `:rebel` : n'écoute pas les séquences du `GameServer`, uniquement les coups joués par les autres joueurs
-  - `:asshole` : envoie des fausses séquences aux autres joueurs
+  - `:color_blind` : ne fait pas la différence entre bleu et rouge.
+  - `:short_memory` : ne se souvient que des 5 derniers tours, pour le reste, c'est du hasard 🎲.
+  - `:rebel` : n'écoute pas les séquences du `GameServer`, uniquement les coups joués par les autres joueurs.
+  - `:asshole` : envoie des fausses séquences aux autres joueurs.
