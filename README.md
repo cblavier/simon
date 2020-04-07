@@ -11,10 +11,11 @@ Il n'y a pas de base de données : `mix deps.get` puis `mix phx.server` suffisen
 
 En appuyant sur "START" la partie doit démarrer puis s'arrêter aussitôt.
 
-L'application est constituée de deux composants principaux :
+L'application est constituée de ces composants :
 
 - `GameLive` est une `LiveView` qui permet de démarrer la partie puis de suivre son avancement.
 - `GameServer` est un `GenServer` qui gère l'état de la partie, donne le tour de jeu au joueur et s'assure que les séquences de couleurs entrées sont correctes. `GameServer` notifie l'ensemble de ses listeners (les joueurs et la liveview) des évènements de la partie.
+- Les IA des joueurs, que vous allez implémenter (une même IA peut être instantiée plusieurs fois avec des noms différents)
 
 ## Coder votre IA
 
